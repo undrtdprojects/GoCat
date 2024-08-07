@@ -1,0 +1,20 @@
+{
+    "name": "GoCat",
+    "app": {
+      "mode": "development",
+      "base_url": "localhost",
+      "port": ":8080"
+    },
+    "migration": {
+      "db": {
+        "postgres": {
+          "db_host": "localhost",
+          "db_port": 5432,
+          "db_name": "gocat",
+          "db_user": "postgres",
+          "db_password": "gregaldi",
+          "db_engine": "postgres"
+        }
+      }
+    }
+  }
