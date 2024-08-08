@@ -37,3 +37,27 @@ type RegexFormat string
 func (d RegexFormat) String() string {
 	return string(d)
 }
+
+type RoleId int
+
+func (d RoleId) Int() int {
+	return int(d)
+}
+
+const (
+	AdminRoleIdUser   RoleId = 1
+	RegularRoleIdUser RoleId = 2
+)
+
+type Action string
+
+func (d Action) String() string {
+	return string(d)
+}
+
+const (
+	CreateActionUser Action = "create"
+	ReadActionUser   Action = "read"
+	UpdateActionUser Action = "update"
+	DeleteActionUser Action = "delete"
+)

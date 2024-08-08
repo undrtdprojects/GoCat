@@ -3,20 +3,22 @@ package common
 import (
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type DefaultFieldTable struct {
 	CreatedAt  time.Time `json:"created_at" db:"created_at"`
-	CreatedBy  string    `json:"created_by" db:"created_by"`
+	CreatedOn  string    `json:"created_on" db:"created_on"`
 	ModifiedAt time.Time `json:"modified_at" db:"modified_at"`
-	ModifiedBy string    `json:"modified_by" db:"modified_by"`
+	ModifiedOn string    `json:"modified_on" db:"modified_on"`
 }
 
-func (d *DefaultFieldTable) SetDefaultField() {
+func (d *DefaultFieldTable) SetDefaultField(ctx *gin.Context) {
 	hostname, _ := os.Hostname()
 
 	d.CreatedAt = time.Now()
-	d.CreatedBy = hostname
-	d.ModifiedBy = hostname
+	d.CreatedOn = hostname
 	d.ModifiedAt = time.Now()
+	d.ModifiedOn = hostname
 }

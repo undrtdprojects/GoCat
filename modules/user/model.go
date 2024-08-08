@@ -1,10 +1,13 @@
 package user
 
 import (
+	"GoCat/helpers/common"
 	"errors"
-	"quiz-3-sanbercode-greg/helpers/common"
+	"os"
 	"regexp"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type User struct {
@@ -14,13 +17,16 @@ type User struct {
 	RoleId     int       `json:"role_id"`
 	CreatedAt  time.Time `json:"created_at"`
 	CreatedBy  string    `json:"created_by"`
+	CreatedOn  string    `json:"created_on"`
 	ModifiedAt time.Time `json:"modified_at"`
 	ModifiedBy string    `json:"modified_by"`
+	ModifiedOn string    `json:"modified_on"`
 }
 
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	RoleId   int    `json:"role_id"`
 }
 
 func (l *LoginRequest) ValidateLogin() (err error) {
@@ -43,6 +49,7 @@ type SignUpRequest struct {
 	Username       string `json:"username"`
 	Password       string `json:"password"`
 	ReTypePassword string `json:"re_type_password"`
+	RoleId         int    `json:"role_id"`
 }
 
 func (s *SignUpRequest) ValidateSignUp() (err error) {
@@ -59,6 +66,9 @@ func (s *SignUpRequest) ValidateSignUp() (err error) {
 	if s.Password != s.ReTypePassword {
 		return errors.New("password and retype password not match")
 	}
+	if common.IsEmptyField(s.RoleId) {
+		return errors.New("role is required")
+	}
 
 	re := regexp.MustCompile(`^(.{8,})$`)
 	if !re.MatchString(s.Password) {
@@ -68,24 +78,23 @@ func (s *SignUpRequest) ValidateSignUp() (err error) {
 	return nil
 }
 
-// set nilai untuk struct User
-func (s *SignUpRequest) ConvertToModelForSignUp() (user User, err error) {
+func (s *SignUpRequest) ConvertToModelForSignUp(ctx *gin.Context) (user User, err error) {
 	hashedPassword, err := common.HashPassword(s.Password)
 	if err != nil {
 		err = errors.New("hashing password failed")
 		return
 	}
 
-	defaultField := common.DefaultFieldTable{}
-	defaultField.SetDefaultField()
+	hostname, _ := os.Hostname()
 
 	return User{
 		Username:   s.Username,
 		Password:   hashedPassword,
-		CreatedAt:  defaultField.CreatedAt,
-		CreatedBy:  defaultField.CreatedBy,
-		ModifiedAt: defaultField.ModifiedAt,
-		ModifiedBy: defaultField.ModifiedBy,
+		RoleId:     s.RoleId,
+		CreatedAt:  time.Now(),
+		CreatedOn:  hostname,
+		ModifiedAt: time.Now(),
+		ModifiedOn: hostname,
 	}, nil
 }
 

@@ -1,8 +1,8 @@
 package user
 
 import (
-	"quiz-3-sanbercode-greg/databases/connection"
-	"quiz-3-sanbercode-greg/helpers/common"
+	"GoCat/databases/connection"
+	"GoCat/helpers/common"
 
 	"github.com/gin-gonic/gin"
 )

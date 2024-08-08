@@ -1,96 +1,96 @@
-package book
+package menu
 
 import (
-	"quiz-3-sanbercode-greg/helpers/common"
-	"quiz-3-sanbercode-greg/middlewares"
+	"GoCat/databases/connection"
+	"GoCat/helpers/common"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Initiator(router *gin.Engine) {
-	api := router.Group("/api/categories/:id")
-	api.Use(middlewares.JwtMiddleware())
-	api.Use(middlewares.Logging())
+	api := router.Group("/api")
+	// api.Use(middlewares.JwtMiddleware())
+	// api.Use(middlewares.Logging())
 	{
-		api.POST("/books", CreateBookRouter)
-		api.GET("/books", GetAllBookRouter)
-		api.GET("/books/:id", GetBookByIdRouter)
-		api.PUT("/books/:id", UpdateBookRouter)
-		api.DELETE("/books/:id", DeleteBookRouter)
+		api.POST("/menu", CreateMenuRouter)
+		api.GET("/menus", GetAllMenuRouter)
+		api.GET("/menu/:id", GetMenuByIdRouter)
+		api.PUT("/menu/:id", UpdateMenuRouter)
+		api.DELETE("/menu/:id", DeleteMenuRouter)
 	}
 }
 
-func CreateBookRouter(ctx *gin.Context) {
+func CreateMenuRouter(ctx *gin.Context) {
 	var (
-		bookRepo = NewRepository()
-		bookSrv  = NewService(bookRepo)
+		menuRepo = NewRepository(connection.DBConnections)
+		menuSrv  = NewService(menuRepo)
 	)
 
-	_, err := bookSrv.CreateBookService(ctx)
+	err := menuSrv.CreateMenuService(ctx)
 	if err != nil {
 		common.GenerateErrorResponse(ctx, err.Error())
 		return
 	}
 
-	common.GenerateSuccessResponse(ctx, "successfully added book data")
+	common.GenerateSuccessResponse(ctx, "successfully added menu data")
 }
 
-func GetAllBookRouter(ctx *gin.Context) {
+func GetAllMenuRouter(ctx *gin.Context) {
 	var (
-		bookRepo = NewRepository()
-		bookSrv  = NewService(bookRepo)
+		menuRepo = NewRepository(connection.DBConnections)
+		menuSrv  = NewService(menuRepo)
 	)
 
-	books, err := bookSrv.GetAllBookService(ctx)
+	menus, err := menuSrv.GetAllMenuService(ctx)
 	if err != nil {
 		common.GenerateErrorResponse(ctx, err.Error())
 		return
 	}
 
-	common.GenerateSuccessResponseWithData(ctx, "successfully get all book data", books)
+	common.GenerateSuccessResponseWithData(ctx, "successfully get all menu data", menus)
 }
 
-func GetBookByIdRouter(ctx *gin.Context) {
+func GetMenuByIdRouter(ctx *gin.Context) {
 	var (
-		bookRepo = NewRepository()
-		bookSrv  = NewService(bookRepo)
+		menuRepo = NewRepository(connection.DBConnections)
+		menuSrv  = NewService(menuRepo)
 	)
 
-	books, err := bookSrv.GetBookByIdService(ctx)
+	menu, err := menuSrv.GetMenuByIdService(ctx)
 	if err != nil {
 		common.GenerateErrorResponse(ctx, err.Error())
 		return
 	}
 
-	common.GenerateSuccessResponseWithData(ctx, "successfully get book data", books)
+	common.GenerateSuccessResponseWithData(ctx, "successfully get menu data", menu)
 }
 
-func DeleteBookRouter(ctx *gin.Context) {
+func DeleteMenuRouter(ctx *gin.Context) {
 	var (
-		bookRepo = NewRepository()
-		bookSrv  = NewService(bookRepo)
+		menuRepo = NewRepository(connection.DBConnections)
+		menuSrv  = NewService(menuRepo)
 	)
 
-	err := bookSrv.DeleteBookService(ctx)
+	err := menuSrv.DeleteMenuService(ctx)
 	if err != nil {
 		common.GenerateErrorResponse(ctx, err.Error())
 		return
 	}
 
-	common.GenerateSuccessResponse(ctx, "successfully delete book data")
+	common.GenerateSuccessResponse(ctx, "successfully delete menu data")
 }
 
-func UpdateBookRouter(ctx *gin.Context) {
+func UpdateMenuRouter(ctx *gin.Context) {
 	var (
-		bookRepo = NewRepository()
-		bookSrv  = NewService(bookRepo)
+		menuRepo = NewRepository(connection.DBConnections)
+		menuSrv  = NewService(menuRepo)
 	)
 
-	err := bookSrv.UpdateBookService(ctx)
+	err := menuSrv.UpdateMenuService(ctx)
 	if err != nil {
 		common.GenerateErrorResponse(ctx, err.Error())
 		return
 	}
 
-	common.GenerateSuccessResponse(ctx, "successfully update book data")
+	common.GenerateSuccessResponse(ctx, "successfully update menu data")
 }

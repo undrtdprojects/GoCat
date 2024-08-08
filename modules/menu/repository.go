@@ -3,13 +3,13 @@ package menu
 import (
 	"GoCat/helpers/constant"
 	"database/sql"
-	"quiz-3-sanbercode-greg/helpers/constant"
 )
 
 type Repository interface {
 	CreateMenuRepository(menu Menu) (err error)
 	GetAllMenuRepository() (result []Menu, err error)
-	GetMenuByIdRepository(id int) (menu Menu, err error)
+	GetMenuCountByCategoryIdRepository(categoryId string) (count int, err error)
+	GetMenuByIdRepository(id string) (menu Menu, err error)
 	DeleteMenuRepository(menu Menu) (err error)
 	UpdateMenuRepository(menu Menu) (err error)
 }
@@ -26,8 +26,8 @@ func NewRepository(database *sql.DB) Repository {
 
 func (r *menuRepository) CreateMenuRepository(menu Menu) (err error) {
 	sqlStmt := "INSERT INTO " + constant.MenuTableName.String() + "\n" +
-		"(id, name, price, category_id, created_at, created_by, modified_at, modified_by)" + "\n" +
-		"VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
+		"(id, name, price, category_id, created_at, created_by, created_on, modified_at, modified_by, modified_on)" + "\n" +
+		"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
 
 	params := []interface{}{
 		menu.Id,
@@ -36,8 +36,10 @@ func (r *menuRepository) CreateMenuRepository(menu Menu) (err error) {
 		menu.CategoryId,
 		menu.CreatedAt,
 		menu.CreatedBy,
+		menu.CreatedOn,
 		menu.ModifiedAt,
 		menu.ModifiedBy,
+		menu.ModifiedOn,
 	}
 
 	_, err = r.db.Exec(sqlStmt, params...)
@@ -49,7 +51,7 @@ func (r *menuRepository) CreateMenuRepository(menu Menu) (err error) {
 }
 
 func (r *menuRepository) GetAllMenuRepository() (menus []Menu, err error) {
-	sqlStmt := "SELECT id, name, price, category_id, created_at, created_by, modified_at, modified_by \n" +
+	sqlStmt := "SELECT id, name, price, category_id, created_at, created_by, created_on, modified_at, modified_by, modified_on \n" +
 		"FROM " + constant.MenuTableName.String()
 
 	rows, err := r.db.Query(sqlStmt)
@@ -61,7 +63,7 @@ func (r *menuRepository) GetAllMenuRepository() (menus []Menu, err error) {
 	for rows.Next() {
 		var menu Menu
 		if err = rows.Scan(&menu.Id, &menu.Name, &menu.Price, &menu.CategoryId,
-			&menu.CreatedAt, &menu.CreatedBy, &menu.ModifiedAt, &menu.ModifiedBy); err != nil {
+			&menu.CreatedAt, &menu.CreatedBy, &menu.CreatedOn, &menu.ModifiedAt, &menu.ModifiedBy, &menu.ModifiedOn); err != nil {
 			return nil, err
 		}
 		menus = append(menus, menu)
@@ -70,8 +72,20 @@ func (r *menuRepository) GetAllMenuRepository() (menus []Menu, err error) {
 	return menus, nil
 }
 
-func (r *menuRepository) GetMenuByIdRepository(id int) (menu Menu, err error) {
-	sqlStmt := "SELECT id, name, price, category_id, created_at, created_by, modified_at, modified_by \n" +
+func (r *menuRepository) GetMenuCountByCategoryIdRepository(categoryId string) (count int, err error) {
+	sqlStmt := "SELECT COUNT(*) FROM " + constant.MenuTableName.String() +
+		" WHERE category_id = $1"
+
+	err = r.db.QueryRow(sqlStmt, categoryId).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count + 1, nil
+}
+
+func (r *menuRepository) GetMenuByIdRepository(id string) (menu Menu, err error) {
+	sqlStmt := "SELECT id, name, price, category_id, created_at, created_by, created_on, modified_at, modified_by, modified_on \n" +
 		"FROM " + constant.MenuTableName.String() + "\n" +
 		"WHERE id = $1"
 
@@ -87,8 +101,8 @@ func (r *menuRepository) GetMenuByIdRepository(id int) (menu Menu, err error) {
 
 	for rows.Next() {
 		if err = rows.Scan(&menu.Id, &menu.Name, &menu.Price, &menu.CategoryId,
-			&menu.CreatedAt, &menu.CreatedBy, &menu.ModifiedAt, &menu.ModifiedBy); err != nil {
-			return nil, err
+			&menu.CreatedAt, &menu.CreatedBy, &menu.CreatedOn, &menu.ModifiedAt, &menu.ModifiedBy, &menu.ModifiedOn); err != nil {
+			return menu, err
 		}
 	}
 	return menu, nil

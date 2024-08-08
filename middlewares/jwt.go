@@ -1,9 +1,8 @@
 package middlewares
 
 import (
+	"GoCat/helpers/common"
 	"errors"
-	"fmt"
-	"quiz-3-sanbercode-greg/helpers/common"
 	"strings"
 	"time"
 
@@ -13,6 +12,9 @@ import (
 )
 
 type Claims struct {
+	UserId   int    `json:"user_id"`
+	Username string `json:"username"`
+	RoleId   int    `json:"role_id"`
 	jwt.StandardClaims
 }
 
@@ -24,26 +26,26 @@ func JwtMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		fmt.Println("tokenString :", tokenString)
-		data, ok := DummyRedis[tokenString]
-		fmt.Println("data jwt :", data)
-		if !ok {
-			common.GenerateErrorResponse(c, "token invalid, please log in again")
+		token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+			return []byte(viper.GetString("jwt_secret_key")), nil
+		})
+		if err != nil {
+			common.GenerateErrorResponse(c, err.Error())
 			return
 		}
 
-		if time.Now().After(data.ExpiredAt) {
-			common.GenerateErrorResponse(c, "token expired, please log in again")
+		if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+			c.Set("user", claims)
+			c.Next()
+		} else {
+			common.GenerateErrorResponse(c, "Invalid token")
 			return
 		}
-		c.Set("auth", data)
-		c.Next()
 	}
 }
 
 func GetJwtTokenFromHeader(c *gin.Context) (tokenString string, err error) {
 	authHeader := c.Request.Header.Get("Authorization")
-	fmt.Println("authHeader :", authHeader)
 
 	if common.IsEmptyField(authHeader) {
 		return tokenString, errors.New("authorization header is required")
@@ -57,10 +59,13 @@ func GetJwtTokenFromHeader(c *gin.Context) (tokenString string, err error) {
 	return parts[1], nil
 }
 
-func GenerateJwtToken() (token string, err error) {
+func GenerateJwtToken(userId int, username string, roleId int) (token string, err error) {
 	// set token expiration time
 	expirationTime := time.Now().Add(1 * time.Hour)
 	claims := &Claims{
+		UserId:   userId,
+		Username: username,
+		RoleId:   roleId,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},

@@ -25,15 +25,17 @@ func NewRepository(database *sql.DB) Repository {
 
 func (r *roleRepository) CreateRoleRepository(role Role) (err error) {
 	sqlStmt := "INSERT INTO " + constant.RoleTableName.String() + "\n" +
-		"(name, created_at, created_by, modified_at, modified_by)" + "\n" +
+		"(name, created_at, created_by, created_on, modified_at, modified_by, modified_on)" + "\n" +
 		"VALUES ($1, $2, $3, $4, $5)"
 
 	params := []interface{}{
 		role.Name,
 		role.CreatedAt,
 		role.CreatedBy,
+		role.CreatedOn,
 		role.ModifiedAt,
 		role.ModifiedBy,
+		role.ModifiedOn,
 	}
 
 	_, err = r.db.Exec(sqlStmt, params...)
@@ -45,7 +47,7 @@ func (r *roleRepository) CreateRoleRepository(role Role) (err error) {
 }
 
 func (r *roleRepository) GetAllRoleRepository() (roles []Role, err error) {
-	sqlStmt := "SELECT id, name, created_at, created_by, modified_at, modified_by \n" +
+	sqlStmt := "SELECT id, name, created_at, created_by, created_on, modified_at, modified_by, modified_on \n" +
 		"FROM " + constant.RoleTableName.String()
 
 	rows, err := r.db.Query(sqlStmt)
@@ -56,8 +58,8 @@ func (r *roleRepository) GetAllRoleRepository() (roles []Role, err error) {
 
 	for rows.Next() {
 		var role Role
-		if err = rows.Scan(&role.Id, &role.Name, &role.CreatedAt, &role.CreatedBy,
-			&role.ModifiedAt, &role.ModifiedBy); err != nil {
+		if err = rows.Scan(&role.Id, &role.Name, &role.CreatedAt, &role.CreatedBy, &role.CreatedOn,
+			&role.ModifiedAt, &role.ModifiedBy, &role.ModifiedOn); err != nil {
 			return nil, err
 		}
 		roles = append(roles, role)
@@ -67,7 +69,7 @@ func (r *roleRepository) GetAllRoleRepository() (roles []Role, err error) {
 }
 
 func (r *roleRepository) GetRoleByIdRepository(id int) (role Role, err error) {
-	sqlStmt := "SELECT id, name, created_at, created_by, modified_at, modified_by \n" +
+	sqlStmt := "SELECT id, name, created_at, created_by, created_on, modified_at, modified_by, modified_on \n" +
 		"FROM " + constant.RoleTableName.String() + "\n" +
 		"WHERE id = $1"
 
@@ -82,8 +84,8 @@ func (r *roleRepository) GetRoleByIdRepository(id int) (role Role, err error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		if err = rows.Scan(&role.Id, &role.Name, &role.CreatedAt, &role.CreatedBy,
-			&role.ModifiedAt, &role.ModifiedBy); err != nil {
+		if err = rows.Scan(&role.Id, &role.Name, &role.CreatedAt, &role.CreatedBy, &role.CreatedOn,
+			&role.ModifiedAt, &role.ModifiedBy, &role.ModifiedOn); err != nil {
 			return role, err
 		}
 	}

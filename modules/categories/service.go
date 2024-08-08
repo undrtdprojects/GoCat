@@ -1,9 +1,11 @@
 package categories
 
 import (
+	"GoCat/helpers/common"
+	"GoCat/helpers/constant"
+	"GoCat/middlewares"
 	"errors"
-	"quiz-3-sanbercode-greg/helpers/common"
-	"strconv"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,87 +18,112 @@ type Service interface {
 	UpdateCategoriesService(ctx *gin.Context) (err error)
 }
 
-type categoryService struct {
+type categoriesService struct {
 	repository Repository
 }
 
 func NewService(repository Repository) Service {
-	return &categoryService{repository}
+	return &categoriesService{repository}
 }
 
-func (service *categoryService) CreateCategoriesService(ctx *gin.Context) (err error) {
-	var newCategories Categories
+func (service *categoriesService) CreateCategoriesService(ctx *gin.Context) (err error) {
+	userCtx, _ := ctx.Get("user")
+	userLogin := userCtx.(*middlewares.Claims)
+	fmt.Println("userLogin", userLogin.Username)
+	if common.CheckRole(userLogin.RoleId, constant.CreateActionUser.String()) {
+		var newCategories Categories
 
-	err = ctx.ShouldBind(&newCategories)
-	if err != nil {
-		return err
-	}
+		err = ctx.ShouldBind(&newCategories)
+		if err != nil {
+			return err
+		}
 
-	defaultField := common.DefaultFieldTable{}
-	defaultField.SetDefaultField()
+		defaultField := common.DefaultFieldTable{}
+		defaultField.SetDefaultField(ctx)
 
-	newCategories.CreatedAt = defaultField.CreatedAt
-	newCategories.CreatedBy = defaultField.CreatedBy
-	newCategories.ModifiedAt = defaultField.ModifiedAt
-	newCategories.ModifiedBy = defaultField.ModifiedBy
+		newCategories.CreatedAt = defaultField.CreatedAt
+		newCategories.CreatedBy = defaultField.CreatedOn
+		newCategories.CreatedOn = userLogin.Username
+		newCategories.ModifiedAt = defaultField.ModifiedAt
+		newCategories.ModifiedBy = defaultField.ModifiedOn
+		newCategories.ModifiedOn = userLogin.Username
 
-	err = service.repository.CreateCategoriesRepository(newCategories)
-	if err != nil {
-		return errors.New("failed to add new category")
-	}
+		err = service.repository.CreateCategoriesRepository(newCategories)
+		if err != nil {
+			return errors.New(err.Error())
+		}
 
-	return
-}
-
-func (service *categoryService) GetAllCategoriesService(ctx *gin.Context) (categories []Categories, err error) {
-	return service.repository.GetAllCategoriesRepository()
-}
-
-func (service *categoryService) GetCategoriesByIdService(ctx *gin.Context) (category Categories, err error) {
-	var (
-		idInt int
-		id    = ctx.Param("id")
-	)
-
-	idInt, err = strconv.Atoi(id)
-	if err != nil {
-		err = errors.New("failed to get id category from param")
 		return
+	} else {
+		return errors.New("you are not authorized")
 	}
-
-	return service.repository.GetCategoriesByIdRepository(idInt)
 }
 
-func (service *categoryService) DeleteCategoriesService(ctx *gin.Context) (err error) {
-	var (
-		category Categories
-		id       = ctx.Param("id")
-	)
+func (service *categoriesService) GetAllCategoriesService(ctx *gin.Context) (categories []Categories, err error) {
+	userCtx, _ := ctx.Get("user")
+	userLogin := userCtx.(*middlewares.Claims)
 
-	category.Id, err = strconv.Atoi(id)
-	if err != nil {
-		err = errors.New("failed to get id category from param")
-		return
+	if common.CheckRole(userLogin.RoleId, constant.ReadActionUser.String()) {
+		return service.repository.GetAllCategoriesRepository()
+	} else {
+		return nil, errors.New("you are not authorized")
 	}
-
-	return service.repository.DeleteCategoriesRepository(category)
 }
 
-func (service *categoryService) UpdateCategoriesService(ctx *gin.Context) (err error) {
-	var (
-		category Categories
-		id       = ctx.Param("id")
-	)
+func (service *categoriesService) GetCategoriesByIdService(ctx *gin.Context) (categories Categories, err error) {
+	userCtx, _ := ctx.Get("user")
+	userLogin := userCtx.(*middlewares.Claims)
 
-	err = ctx.ShouldBind(&category)
-	if err != nil {
-		return
-	}
+	if common.CheckRole(userLogin.RoleId, constant.ReadActionUser.String()) {
+		var id = ctx.Param("id")
 
-	category.Id, err = strconv.Atoi(id)
-	if err != nil {
-		err = errors.New("failed to get id category from param")
-		return
+		categories, err = service.repository.GetCategoriesByIdRepository(id)
+		if common.IsEmptyField(categories.Id) {
+			return categories, errors.New("categories not found")
+		}
+
+		return categories, err
+	} else {
+		return categories, errors.New("you are not authorized")
 	}
-	return service.repository.UpdateCategoriesRepository(category)
+}
+
+func (service *categoriesService) DeleteCategoriesService(ctx *gin.Context) (err error) {
+	userCtx, _ := ctx.Get("user")
+	userLogin := userCtx.(*middlewares.Claims)
+
+	if common.CheckRole(userLogin.RoleId, constant.DeleteActionUser.String()) {
+		var categories Categories
+		categories.Id = ctx.Param("id")
+
+		return service.repository.DeleteCategoriesRepository(categories)
+	} else {
+		return errors.New("you are not authorized")
+	}
+}
+
+func (service *categoriesService) UpdateCategoriesService(ctx *gin.Context) (err error) {
+	userCtx, _ := ctx.Get("user")
+	userLogin := userCtx.(*middlewares.Claims)
+
+	if common.CheckRole(userLogin.RoleId, constant.DeleteActionUser.String()) {
+		var newCategories Categories
+
+		err = ctx.ShouldBind(&newCategories)
+		if err != nil {
+			return
+		}
+
+		defaultField := common.DefaultFieldTable{}
+		defaultField.SetDefaultField(ctx)
+
+		newCategories.ModifiedAt = defaultField.ModifiedAt
+		newCategories.ModifiedBy = userLogin.Username
+		newCategories.ModifiedOn = defaultField.ModifiedOn
+
+		newCategories.Id = ctx.Param("id")
+		return service.repository.UpdateCategoriesRepository(newCategories)
+	} else {
+		return errors.New("you are not authorized")
+	}
 }

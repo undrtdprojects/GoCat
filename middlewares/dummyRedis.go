@@ -3,11 +3,9 @@ package middlewares
 import "time"
 
 type UserLoginRedis struct {
-	UserId    int64
+	UserId    int
 	Username  string
-	Role      string
+	RoleId    int
 	LoginAt   time.Time
 	ExpiredAt time.Time
 }
-
-var DummyRedis = make(map[string]UserLoginRedis)

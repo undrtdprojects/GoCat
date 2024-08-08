@@ -8,6 +8,7 @@ import (
 type Repository interface {
 	CreateTransaction0Repository(transaction0 Transaction0) (err error)
 	GetAllTransaction0Repository() (transaction0s []Transaction0, err error)
+	GetTransaction0CountRepository() (count int, err error)
 	GetTransaction0ByIdRepository(id string) (transaction0 Transaction0, err error)
 	DeleteTransaction0Repository(transaction0 Transaction0) (err error)
 	UpdateTransaction0Repository(transaction0 Transaction0) (err error)
@@ -25,7 +26,7 @@ func NewRepository(database *sql.DB) Repository {
 
 func (r *transaction0Repository) CreateTransaction0Repository(transaction0 Transaction0) (err error) {
 	sqlStmt := "INSERT INTO " + constant.Transaction0TableName.String() + "\n" +
-		"(id, user_id, grand_total_price, created_at, created_by, modified_at, modified_by)" + "\n" +
+		"(id, user_id, grand_total_price, created_at, created_by, created_on, modified_at, modified_by, modified_on)" + "\n" +
 		"VALUES ($1, $2, $3, $4, $5, $6, $7)"
 
 	params := []interface{}{
@@ -34,8 +35,10 @@ func (r *transaction0Repository) CreateTransaction0Repository(transaction0 Trans
 		transaction0.GrandTotalPrice,
 		transaction0.CreatedAt,
 		transaction0.CreatedBy,
+		transaction0.CreatedOn,
 		transaction0.ModifiedAt,
 		transaction0.ModifiedBy,
+		transaction0.ModifiedOn,
 	}
 
 	_, err = r.db.Exec(sqlStmt, params...)
@@ -47,7 +50,7 @@ func (r *transaction0Repository) CreateTransaction0Repository(transaction0 Trans
 }
 
 func (r *transaction0Repository) GetAllTransaction0Repository() (transaction0s []Transaction0, err error) {
-	sqlStmt := "SELECT id, user_id, grand_total_price, created_at, created_by, modified_at, modified_by \n" +
+	sqlStmt := "SELECT id, user_id, grand_total_price, created_at, created_by, created_on, modified_at, modified_by, modified_on \n" +
 		"FROM " + constant.Transaction0TableName.String()
 
 	rows, err := r.db.Query(sqlStmt)
@@ -59,7 +62,8 @@ func (r *transaction0Repository) GetAllTransaction0Repository() (transaction0s [
 	for rows.Next() {
 		var transaction0 Transaction0
 		if err = rows.Scan(&transaction0.Id, &transaction0.UserId, &transaction0.GrandTotalPrice,
-			&transaction0.CreatedAt, &transaction0.CreatedBy, &transaction0.ModifiedAt, &transaction0.ModifiedBy); err != nil {
+			&transaction0.CreatedAt, &transaction0.CreatedBy, &transaction0.CreatedOn,
+			&transaction0.ModifiedAt, &transaction0.ModifiedBy, transaction0.ModifiedOn); err != nil {
 			return nil, err
 		}
 		transaction0s = append(transaction0s, transaction0)
@@ -68,8 +72,19 @@ func (r *transaction0Repository) GetAllTransaction0Repository() (transaction0s [
 	return transaction0s, nil
 }
 
+func (r *transaction0Repository) GetTransaction0CountRepository() (count int, err error) {
+	sqlStmt := "SELECT COUNT(*) FROM " + constant.Transaction0TableName.String()
+
+	err = r.db.QueryRow(sqlStmt).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count + 1, nil
+}
+
 func (r *transaction0Repository) GetTransaction0ByIdRepository(id string) (transaction0 Transaction0, err error) {
-	sqlStmt := "SELECT id, user_id, grand_total_price, created_at, created_by, modified_at, modified_by \n" +
+	sqlStmt := "SELECT id, user_id, grand_total_price, created_at, created_by, created_on, modified_at, modified_by, modified_on \n" +
 		"FROM " + constant.Transaction0TableName.String() + "\n" +
 		"WHERE id = $1"
 
@@ -85,7 +100,8 @@ func (r *transaction0Repository) GetTransaction0ByIdRepository(id string) (trans
 
 	for rows.Next() {
 		if err = rows.Scan(&transaction0.Id, &transaction0.UserId, &transaction0.GrandTotalPrice,
-			&transaction0.CreatedAt, &transaction0.CreatedBy, &transaction0.ModifiedAt, &transaction0.ModifiedBy); err != nil {
+			&transaction0.CreatedAt, &transaction0.CreatedBy, &transaction0.CreatedOn,
+			&transaction0.ModifiedAt, &transaction0.ModifiedBy, &transaction0.ModifiedOn); err != nil {
 			return transaction0, err
 		}
 	}

@@ -1,8 +1,8 @@
 package user
 
 import (
+	"GoCat/helpers/constant"
 	"database/sql"
-	"quiz-3-sanbercode-greg/helpers/constant"
 )
 
 type Repository interface {
@@ -12,6 +12,7 @@ type Repository interface {
 	Delete(user User) (err error)
 	GetList() (user []User, err error)
 	GetUserByUsername(username string) (user User, err error)
+	GetUserById(id int) (user User, err error)
 }
 type userRepository struct {
 	db *sql.DB
@@ -24,13 +25,13 @@ func NewRepository(database *sql.DB) Repository {
 }
 
 func (r *userRepository) Login(user LoginRequest) (result User, err error) {
-	sqlStmt := "SELECT id, password FROM " + constant.UsersTableName.String() + " WHERE username = $1"
+	sqlStmt := "SELECT id, username, password, role_id FROM " + constant.UsersTableName.String() + " WHERE username = $1"
 
 	params := []interface{}{
 		user.Username,
 	}
 
-	err = r.db.QueryRow(sqlStmt, params...).Scan(&result.Id, &result.Password)
+	err = r.db.QueryRow(sqlStmt, params...).Scan(&result.Id, &result.Username, &result.Password, &result.RoleId)
 	if err != nil && err != sql.ErrNoRows {
 		return result, err
 	}
@@ -38,18 +39,20 @@ func (r *userRepository) Login(user LoginRequest) (result User, err error) {
 	return result, nil
 }
 
-// query untuk insert data user ke database (sign up)
 func (r *userRepository) SignUp(user User) (err error) {
 	sqlStmt := "INSERT INTO " + constant.UsersTableName.String() +
-		" (username, password, created_at, created_by, modified_at, modified_by) VALUES ($1, $2, $3, $4, $5, $6)"
+		" (username, password, role_id, created_at, created_by, created_on, modified_at, modified_by, modified_on) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"
 
 	params := []interface{}{
 		user.Username,
 		user.Password,
+		user.RoleId,
 		user.CreatedAt,
 		user.CreatedBy,
+		user.CreatedOn,
 		user.ModifiedAt,
 		user.ModifiedBy,
+		user.ModifiedOn,
 	}
 
 	_, err = r.db.Exec(sqlStmt, params...)
@@ -61,10 +64,17 @@ func (r *userRepository) SignUp(user User) (err error) {
 }
 
 func (r *userRepository) Update(user User) (err error) {
-	sqlStmt := "UPDATE " + constant.UsersTableName.String() + " SET password = $1 WHERE username = $2"
+	sqlStmt := "UPDATE " + constant.UsersTableName.String() +
+		"SET username = $1, password = $2, role_id = $3, modified_at = $4, modified_by = $5, modified_on = $6 WHERE id = $7"
 
 	params := []interface{}{
+		user.Username,
 		user.Password,
+		user.RoleId,
+		user.ModifiedAt,
+		user.ModifiedBy,
+		user.ModifiedOn,
+		user.Id,
 	}
 
 	_, err = r.db.Exec(sqlStmt, params...)
@@ -91,7 +101,7 @@ func (r *userRepository) Delete(user User) (err error) {
 }
 
 func (r *userRepository) GetList() (users []User, err error) {
-	sqlStmt := "SELECT username, password FROM " + constant.UsersTableName.String()
+	sqlStmt := "SELECT username, password, role_id FROM " + constant.UsersTableName.String()
 
 	rows, err := r.db.Query(sqlStmt)
 	if err != nil {
@@ -101,7 +111,7 @@ func (r *userRepository) GetList() (users []User, err error) {
 
 	for rows.Next() {
 		var user User
-		if err = rows.Scan(&user.Username, &user.Password); err != nil {
+		if err = rows.Scan(&user.Username, &user.Password, &user.RoleId); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -111,7 +121,7 @@ func (r *userRepository) GetList() (users []User, err error) {
 }
 
 func (r *userRepository) GetUserByUsername(username string) (user User, err error) {
-	sqlStmt := "SELECT username, password FROM " + constant.UsersTableName.String() + " WHERE username = $1"
+	sqlStmt := "SELECT username, password, role_id FROM " + constant.UsersTableName.String() + " WHERE username = $1"
 
 	params := []interface{}{
 		username,
@@ -123,7 +133,27 @@ func (r *userRepository) GetUserByUsername(username string) (user User, err erro
 	defer rows.Close()
 
 	for rows.Next() {
-		if err = rows.Scan(&user.Username, &user.Password); err != nil {
+		if err = rows.Scan(&user.Username, &user.Password, &user.RoleId); err != nil {
+			return user, err
+		}
+	}
+	return user, nil
+}
+
+func (r *userRepository) GetUserById(id int) (user User, err error) {
+	sqlStmt := "SELECT username, password, role_id FROM " + constant.UsersTableName.String() + " WHERE id = $1"
+
+	params := []interface{}{
+		id,
+	}
+	rows, err := r.db.Query(sqlStmt, params...)
+	if err != nil {
+		return user, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(&user.Username, &user.Password, &user.RoleId); err != nil {
 			return user, err
 		}
 	}

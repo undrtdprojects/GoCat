@@ -8,7 +8,7 @@ import (
 type Repository interface {
 	CreateCategoriesRepository(category Categories) (err error)
 	GetAllCategoriesRepository() (result []Categories, err error)
-	GetCategoriesByIdRepository(id int) (category Categories, err error)
+	GetCategoriesByIdRepository(id string) (category Categories, err error)
 	DeleteCategoriesRepository(category Categories) (err error)
 	UpdateCategoriesRepository(category Categories) (err error)
 }
@@ -25,16 +25,18 @@ func NewRepository(database *sql.DB) Repository {
 
 func (r *categoriesRepository) CreateCategoriesRepository(category Categories) (err error) {
 	sqlStmt := "INSERT INTO " + constant.CategoriesTableName.String() + "\n" +
-		" (id, name, created_at, created_by, modified_at, modified_by)" + "\n" +
-		" VALUES ($1, $2, $3, $4, $5, $6)"
+		" (id, name, created_at, created_by, created_on, modified_at, modified_by, modified_on)" + "\n" +
+		" VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
 
 	params := []interface{}{
 		category.Id,
 		category.Name,
 		category.CreatedAt,
 		category.CreatedBy,
+		category.CreatedOn,
 		category.ModifiedAt,
 		category.ModifiedBy,
+		category.ModifiedOn,
 	}
 
 	_, err = r.db.Exec(sqlStmt, params...)
@@ -46,7 +48,7 @@ func (r *categoriesRepository) CreateCategoriesRepository(category Categories) (
 }
 
 func (r *categoriesRepository) GetAllCategoriesRepository() (categories []Categories, err error) {
-	sqlStmt := "SELECT id, name, created_at, created_by, modified_at, modified_by " + "\n" +
+	sqlStmt := "SELECT id, name, created_at, created_by, created_on, modified_at, modified_by, modified_on " + "\n" +
 		"FROM " + constant.CategoriesTableName.String()
 
 	rows, err := r.db.Query(sqlStmt)
@@ -57,8 +59,8 @@ func (r *categoriesRepository) GetAllCategoriesRepository() (categories []Catego
 
 	for rows.Next() {
 		var category Categories
-		if err = rows.Scan(&category.Id, &category.Name, &category.CreatedAt, &category.CreatedBy,
-			&category.ModifiedAt, &category.ModifiedBy); err != nil {
+		if err = rows.Scan(&category.Id, &category.Name, &category.CreatedAt, &category.CreatedBy, &category.CreatedOn,
+			&category.ModifiedAt, &category.ModifiedBy, &category.ModifiedOn); err != nil {
 			return nil, err
 		}
 		categories = append(categories, category)
@@ -67,8 +69,8 @@ func (r *categoriesRepository) GetAllCategoriesRepository() (categories []Catego
 	return categories, nil
 }
 
-func (r *categoriesRepository) GetCategoriesByIdRepository(id int) (category Categories, err error) {
-	sqlStmt := "SELECT id, name, created_at, created_by, modified_at, modified_by" + "\n" +
+func (r *categoriesRepository) GetCategoriesByIdRepository(id string) (category Categories, err error) {
+	sqlStmt := "SELECT id, name, created_at, created_by, created_on, modified_at, modified_by, modified_on" + "\n" +
 		"FROM " + constant.CategoriesTableName.String() + "\n" +
 		"WHERE id = $1"
 
@@ -83,8 +85,8 @@ func (r *categoriesRepository) GetCategoriesByIdRepository(id int) (category Cat
 	defer rows.Close()
 
 	for rows.Next() {
-		if err = rows.Scan(&category.Id, &category.Name, &category.CreatedAt, &category.CreatedBy,
-			&category.ModifiedAt, &category.ModifiedBy); err != nil {
+		if err = rows.Scan(&category.Id, &category.Name, &category.CreatedAt, &category.CreatedBy, &category.CreatedOn,
+			&category.ModifiedAt, &category.ModifiedBy, &category.ModifiedOn); err != nil {
 			return category, err
 		}
 	}

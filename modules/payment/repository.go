@@ -25,16 +25,17 @@ func NewRepository(database *sql.DB) Repository {
 
 func (r *paymentRepository) CreatePaymentRepository(payment Payment) (err error) {
 	sqlStmt := "INSERT INTO " + constant.PaymentTableName.String() + "\n" +
-		"(name, created_at, created_by, modified_at, modified_by)" + "\n" +
-		"VALUES ($1, $2, $3, $4, $5)"
+		"(name, created_at, created_by, created_on, modified_at, modified_by, modified_on)" + "\n" +
+		"VALUES ($1, $2, $3, $4, $5, $6, $7)"
 
 	params := []interface{}{
-		payment.Id,
 		payment.Name,
 		payment.CreatedAt,
 		payment.CreatedBy,
+		payment.CreatedOn,
 		payment.ModifiedAt,
 		payment.ModifiedBy,
+		payment.ModifiedOn,
 	}
 
 	_, err = r.db.Exec(sqlStmt, params...)
@@ -46,7 +47,7 @@ func (r *paymentRepository) CreatePaymentRepository(payment Payment) (err error)
 }
 
 func (r *paymentRepository) GetAllPaymentRepository() (payments []Payment, err error) {
-	sqlStmt := "SELECT id, name, created_at, created_by, modified_at, modified_by \n" +
+	sqlStmt := "SELECT id, name, created_at, created_by, created_on, modified_at, modified_by, modified_on \n" +
 		"FROM " + constant.PaymentTableName.String()
 
 	rows, err := r.db.Query(sqlStmt)
@@ -57,8 +58,8 @@ func (r *paymentRepository) GetAllPaymentRepository() (payments []Payment, err e
 
 	for rows.Next() {
 		var payment Payment
-		if err = rows.Scan(&payment.Id, &payment.Name, &payment.CreatedAt, &payment.CreatedBy,
-			&payment.ModifiedAt, &payment.ModifiedBy); err != nil {
+		if err = rows.Scan(&payment.Id, &payment.Name, &payment.CreatedAt, &payment.CreatedBy, &payment.CreatedOn,
+			&payment.ModifiedAt, &payment.ModifiedBy, &payment.ModifiedOn); err != nil {
 			return nil, err
 		}
 		payments = append(payments, payment)
@@ -68,7 +69,7 @@ func (r *paymentRepository) GetAllPaymentRepository() (payments []Payment, err e
 }
 
 func (r *paymentRepository) GetPaymentByIdRepository(id int) (payment Payment, err error) {
-	sqlStmt := "SELECT id, name, created_at, created_by, modified_at, modified_by \n" +
+	sqlStmt := "SELECT id, name, created_at, created_by, created_on, modified_at, modified_by, modified_on \n" +
 		"FROM " + constant.PaymentTableName.String() + "\n" +
 		"WHERE id = $1"
 
@@ -83,8 +84,8 @@ func (r *paymentRepository) GetPaymentByIdRepository(id int) (payment Payment, e
 	defer rows.Close()
 
 	for rows.Next() {
-		if err = rows.Scan(&payment.Id, &payment.Name, &payment.CreatedAt, &payment.CreatedBy,
-			&payment.ModifiedAt, &payment.ModifiedBy); err != nil {
+		if err = rows.Scan(&payment.Id, &payment.Name, &payment.CreatedAt, &payment.CreatedBy, &payment.CreatedOn,
+			&payment.ModifiedAt, &payment.ModifiedBy, &payment.ModifiedOn); err != nil {
 			return payment, err
 		}
 	}

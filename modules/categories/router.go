@@ -1,9 +1,9 @@
 package categories
 
 import (
-	"quiz-3-sanbercode-greg/databases/connection"
-	"quiz-3-sanbercode-greg/helpers/common"
-	"quiz-3-sanbercode-greg/middlewares"
+	"GoCat/databases/connection"
+	"GoCat/helpers/common"
+	"GoCat/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,101 +13,85 @@ func Initiator(router *gin.Engine) {
 	api.Use(middlewares.JwtMiddleware())
 	api.Use(middlewares.Logging())
 	{
-		api.POST("/categories", CreateCategoryRouter)
-		api.GET("/categories", GetAllCategoryRouter)
-		api.GET("/categories/:id", GetCategoryByIdRouter)
-		api.GET("/categories/:id/books", GetAllBooksByCategoryRouter)
-		api.PUT("/categories/:id", UpdateCategoryRouter)
-		api.DELETE("/categories/:id", DeleteCategoryRouter)
+		api.POST("/categories", CreateCategoriesRouter)
+		api.GET("/categories", GetAllCategoriesRouter)
+		api.GET("/categories/:id", GetCategoriesByIdRouter)
+		api.PUT("/categories/:id", UpdateCategoriesRouter)
+		api.DELETE("/categories/:id", DeleteCategoriesRouter)
 	}
 }
 
-func CreateCategoryRouter(ctx *gin.Context) {
+func CreateCategoriesRouter(ctx *gin.Context) {
 	var (
-		categoryRepo = NewRepository(connection.DBConnections)
-		categorySrv  = NewService(categoryRepo)
+		categoriesRepo = NewRepository(connection.DBConnections)
+		categoriesSrv  = NewService(categoriesRepo)
 	)
 
-	err := categorySrv.CreateCategoryService(ctx)
+	err := categoriesSrv.CreateCategoriesService(ctx)
 	if err != nil {
 		common.GenerateErrorResponse(ctx, err.Error())
 		return
 	}
 
-	common.GenerateSuccessResponse(ctx, "successfully added category data")
+	common.GenerateSuccessResponse(ctx, "successfully added categories data")
 }
 
-func GetAllCategoryRouter(ctx *gin.Context) {
+func GetAllCategoriesRouter(ctx *gin.Context) {
 	var (
-		categoryRepo = NewRepository(connection.DBConnections)
-		categorySrv  = NewService(categoryRepo)
+		categoriesRepo = NewRepository(connection.DBConnections)
+		categoriesSrv  = NewService(categoriesRepo)
 	)
 
-	categories, err := categorySrv.GetAllCategoryService(ctx)
+	categories, err := categoriesSrv.GetAllCategoriesService(ctx)
 	if err != nil {
 		common.GenerateErrorResponse(ctx, err.Error())
 		return
 	}
 
-	common.GenerateSuccessResponseWithListData(ctx, "successfully get all category data", int64(len(categories)), categories)
+	common.GenerateSuccessResponseWithListData(ctx, "successfully get all categories data", int64(len(categories)), categories)
 }
 
-func GetCategoryByIdRouter(ctx *gin.Context) {
+func GetCategoriesByIdRouter(ctx *gin.Context) {
 	var (
-		categoryRepo = NewRepository(connection.DBConnections)
-		categorySrv  = NewService(categoryRepo)
+		categoriesRepo = NewRepository(connection.DBConnections)
+		categoriesSrv  = NewService(categoriesRepo)
 	)
 
-	category, err := categorySrv.GetCategoryByIdService(ctx)
+	categories, err := categoriesSrv.GetCategoriesByIdService(ctx)
 	if err != nil {
 		common.GenerateErrorResponse(ctx, err.Error())
 		return
 	}
 
-	common.GenerateSuccessResponseWithData(ctx, "successfully get category data", category)
+	common.GenerateSuccessResponseWithData(ctx, "successfully get categories data", categories)
 }
 
-func GetAllBooksByCategoryRouter(ctx *gin.Context) {
+func DeleteCategoriesRouter(ctx *gin.Context) {
 	var (
-		categoryRepo = NewRepository(connection.DBConnections)
-		categorySrv  = NewService(categoryRepo)
+		categoriesRepo = NewRepository(connection.DBConnections)
+		categoriesSrv  = NewService(categoriesRepo)
 	)
 
-	category, err := categorySrv.GetCategoryByIdService(ctx)
+	err := categoriesSrv.DeleteCategoriesService(ctx)
 	if err != nil {
 		common.GenerateErrorResponse(ctx, err.Error())
 		return
 	}
 
-	common.GenerateSuccessResponseWithData(ctx, "successfully get category data", category)
+	common.GenerateSuccessResponse(ctx, "successfully delete categories data")
 }
 
-func DeleteCategoryRouter(ctx *gin.Context) {
+func UpdateCategoriesRouter(ctx *gin.Context) {
 	var (
-		categoryRepo = NewRepository(connection.DBConnections)
-		categorySrv  = NewService(categoryRepo)
+		categoriesRepo = NewRepository(connection.DBConnections)
+		categoriesSrv  = NewService(categoriesRepo)
 	)
 
-	err := categorySrv.DeleteCategoryService(ctx)
+	err := categoriesSrv.UpdateCategoriesService(ctx)
 	if err != nil {
 		common.GenerateErrorResponse(ctx, err.Error())
 		return
 	}
 
-	common.GenerateSuccessResponse(ctx, "successfully delete category data")
-}
-
-func UpdateCategoryRouter(ctx *gin.Context) {
-	var (
-		categoryRepo = NewRepository(connection.DBConnections)
-		categorySrv  = NewService(categoryRepo)
-	)
-
-	err := categorySrv.UpdateCategoryService(ctx)
-	if err != nil {
-		common.GenerateErrorResponse(ctx, err.Error())
-		return
-	}
-
-	common.GenerateSuccessResponse(ctx, "successfully update category data")
+	common.GenerateSuccessResponse(ctx, "successfully update categories data")
 }
