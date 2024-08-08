@@ -2,7 +2,6 @@ package categories
 
 import (
 	"errors"
-	"fmt"
 	"quiz-3-sanbercode-greg/helpers/common"
 	"strconv"
 
@@ -33,22 +32,6 @@ func (service *categoryService) CreateCategoriesService(ctx *gin.Context) (err e
 		return err
 	}
 
-	var categories []Categories
-	categories, err = service.repository.GetAllCategoriesRepository()
-	if err != nil {
-		return err
-	}
-
-	category, err := service.repository.GetCategoriesByNameRepository(newCategories.Name)
-	if err != nil {
-		return err
-	}
-
-	if len(categories) != 0 && category.Name != "" {
-		err = errors.New("category already exists")
-		return err
-	}
-
 	defaultField := common.DefaultFieldTable{}
 	defaultField.SetDefaultField()
 
@@ -57,7 +40,6 @@ func (service *categoryService) CreateCategoriesService(ctx *gin.Context) (err e
 	newCategories.ModifiedAt = defaultField.ModifiedAt
 	newCategories.ModifiedBy = defaultField.ModifiedBy
 
-	fmt.Println("create categories :", newCategories)
 	err = service.repository.CreateCategoriesRepository(newCategories)
 	if err != nil {
 		return errors.New("failed to add new category")

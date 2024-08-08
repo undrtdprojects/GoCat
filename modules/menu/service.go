@@ -1,4 +1,4 @@
-package book
+package menu
 
 import (
 	"errors"
@@ -10,67 +10,51 @@ import (
 )
 
 type Service interface {
-	CreateBookService(ctx *gin.Context) (err error)
-	GetAllBookService(ctx *gin.Context) (result []Book, err error)
-	GetBookByIdService(ctx *gin.Context) (result Book, err error)
-	DeleteBookService(ctx *gin.Context) (err error)
-	UpdateBookService(ctx *gin.Context) (err error)
+	CreateMenuService(ctx *gin.Context) (err error)
+	GetAllMenuService(ctx *gin.Context) (result []Menu, err error)
+	GetMenuByIdService(ctx *gin.Context) (result Menu, err error)
+	DeleteMenuService(ctx *gin.Context) (err error)
+	UpdateMenuService(ctx *gin.Context) (err error)
 }
 
-type bookService struct {
+type MenuService struct {
 	repository Repository
 }
 
 func NewService(repository Repository) Service {
-	return &bookService{repository}
+	return &MenuService{repository}
 }
 
-func (service *bookService) CreateBookService(ctx *gin.Context) (err error) {
-	var newBook Book
+func (service *MenuService) CreateMenuService(ctx *gin.Context) (err error) {
+	var newMenu Menu
 
-	err = ctx.ShouldBind(&newBook)
+	err = ctx.ShouldBind(&newMenu)
 	if err != nil {
-		return err
-	}
-
-	var categories []Book
-	categories, err = service.repository.GetAllBookRepository()
-	if err != nil {
-		return err
-	}
-
-	book, err := service.repository.GetBookByTitleRepository(newBook.Title)
-	if err != nil {
-		return err
-	}
-
-	if len(categories) != 0 && book.Title != "" {
-		err = errors.New("book already exists")
 		return err
 	}
 
 	defaultField := common.DefaultFieldTable{}
 	defaultField.SetDefaultField()
 
-	newBook.CreatedAt = defaultField.CreatedAt
-	newBook.CreatedBy = defaultField.CreatedBy
-	newBook.ModifiedAt = defaultField.ModifiedAt
-	newBook.ModifiedBy = defaultField.ModifiedBy
+	newMenu.CreatedAt = defaultField.CreatedAt
+	newMenu.CreatedBy = defaultField.CreatedBy
+	newMenu.ModifiedAt = defaultField.ModifiedAt
+	newMenu.ModifiedBy = defaultField.ModifiedBy
 
-	fmt.Println("create categories :", newBook)
-	err = service.repository.CreateBookRepository(newBook)
+	fmt.Println("create categories :", newMenu)
+	err = service.repository.CreateMenuRepository(newMenu)
 	if err != nil {
-		return errors.New("failed to add new book")
+		return errors.New("failed to add new Menu")
 	}
 
 	return
 }
 
-func (service *bookService) GetAllBookService(ctx *gin.Context) (categories []Book, err error) {
-	return service.repository.GetAllBookRepository()
+func (service *MenuService) GetAllMenuService(ctx *gin.Context) (categories []Menu, err error) {
+	return service.repository.GetAllMenuRepository()
 }
 
-func (service *bookService) GetBookByIdService(ctx *gin.Context) (book Book, err error) {
+func (service *MenuService) GetMenuByIdService(ctx *gin.Context) (Menu Menu, err error) {
 	var (
 		idInt int
 		id    = ctx.Param("id")
@@ -78,14 +62,14 @@ func (service *bookService) GetBookByIdService(ctx *gin.Context) (book Book, err
 
 	idInt, err = strconv.Atoi(id)
 	if err != nil {
-		err = errors.New("failed to get id book from param")
+		err = errors.New("failed to get id Menu from param")
 		return
 	}
 
-	return service.repository.GetBookByIdRepository(idInt)
+	return service.repository.GetMenuByIdRepository(idInt)
 }
 
-func (service *bookService) GetAllBooksByBookService(ctx *gin.Context) (books []book.Book, err error) {
+func (service *MenuService) GetAllMenusByMenuService(ctx *gin.Context) (Menus []Menu.Menu, err error) {
 	var (
 		idInt int
 		id    = ctx.Param("id")
@@ -94,43 +78,43 @@ func (service *bookService) GetAllBooksByBookService(ctx *gin.Context) (books []
 
 	idInt, err = strconv.Atoi(id)
 	if err != nil {
-		err = errors.New("failed to get id book from param")
+		err = errors.New("failed to get id Menu from param")
 		return
 	}
 
-	return service.repository.GetAllBooksByBookRepository(idInt, name)
+	return service.repository.GetAllMenusByMenuRepository(idInt, name)
 }
 
-func (service *bookService) DeleteBookService(ctx *gin.Context) (err error) {
+func (service *MenuService) DeleteMenuService(ctx *gin.Context) (err error) {
 	var (
-		book Book
+		Menu Menu
 		id   = ctx.Param("id")
 	)
 
-	book.Id, err = strconv.Atoi(id)
+	Menu.Id, err = strconv.Atoi(id)
 	if err != nil {
-		err = errors.New("failed to get id book from param")
+		err = errors.New("failed to get id Menu from param")
 		return
 	}
 
-	return service.repository.DeleteBookRepository(book)
+	return service.repository.DeleteMenuRepository(Menu)
 }
 
-func (service *bookService) UpdateBookService(ctx *gin.Context) (err error) {
+func (service *MenuService) UpdateMenuService(ctx *gin.Context) (err error) {
 	var (
-		book Book
+		Menu Menu
 		id   = ctx.Param("id")
 	)
 
-	err = ctx.ShouldBind(&book)
+	err = ctx.ShouldBind(&Menu)
 	if err != nil {
 		return
 	}
 
-	book.Id, err = strconv.Atoi(id)
+	Menu.Id, err = strconv.Atoi(id)
 	if err != nil {
-		err = errors.New("failed to get id book from param")
+		err = errors.New("failed to get id Menu from param")
 		return
 	}
-	return service.repository.UpdateBookRepository(book)
+	return service.repository.UpdateMenuRepository(Menu)
 }
