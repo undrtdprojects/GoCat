@@ -15,7 +15,7 @@ func Initiator(router *gin.Engine) {
 	api.Use(middlewares.RoleCheck())
 	{
 		api.POST("/role", CreateRoleRouter)
-		api.GET("/role", GetAllRoleRouter)
+		api.GET("/roles", GetAllRoleRouter)
 		api.GET("/role/:id", GetRoleByIdRouter)
 		api.PUT("/role/:id", UpdateRoleRouter)
 		api.DELETE("/role/:id", DeleteRoleRouter)

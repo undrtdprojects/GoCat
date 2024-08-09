@@ -17,7 +17,7 @@ func Initiator(router *gin.Engine) {
 	api.Use(middlewares.RoleCheck())
 	{
 		api.POST("/transaction0", CreateTransaction0Router)
-		api.GET("/transaction0", GetAllTransaction0Router)
+		api.GET("/transaction0s", GetAllTransaction0Router)
 		api.GET("/transaction0/:id", GetTransaction0ByIdRouter)
 		api.PUT("/transaction0/:id", UpdateTransaction0Router)
 		api.DELETE("/transaction0/:id", DeleteTransaction0Router)
