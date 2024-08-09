@@ -13,6 +13,7 @@ func Initiator(router *gin.Engine) {
 		api.POST("/login", Login)
 		api.POST("/signup", SignUp)
 		api.PUT("/change-password", ChangePassword)
+		api.GET("/users", GetListUser)
 	}
 }
 
@@ -59,4 +60,19 @@ func ChangePassword(ctx *gin.Context) {
 	}
 
 	common.GenerateSuccessResponse(ctx, "awesome, successfully change password")
+}
+
+func GetListUser(ctx *gin.Context) {
+	var (
+		userRepo = NewRepository(connection.DBConnections)
+		userSrv  = NewService(userRepo)
+	)
+
+	users, err := userSrv.GetListUserService(ctx)
+	if err != nil {
+		common.GenerateErrorResponse(ctx, err.Error())
+		return
+	}
+
+	common.GenerateSuccessResponseWithData(ctx, "successfully get all user data", users)
 }

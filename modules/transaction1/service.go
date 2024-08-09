@@ -4,7 +4,6 @@ import (
 	"GoCat/helpers/common"
 	"GoCat/middlewares"
 	"GoCat/modules/menu"
-	"GoCat/modules/transaction0"
 
 	"errors"
 	"strconv"
@@ -22,12 +21,11 @@ type Service interface {
 
 type transaction1Service struct {
 	repository Repository
-	trans0Repo transaction0.Repository
 	menuRepo   menu.Repository
 }
 
-func NewService(repository Repository, trans0Repo transaction0.Repository, menuRepo menu.Repository) Service {
-	return &transaction1Service{repository, trans0Repo, menuRepo}
+func NewService(repository Repository, menuRepo menu.Repository) Service {
+	return &transaction1Service{repository, menuRepo}
 }
 
 func (service *transaction1Service) CreateTransaction1Service(ctx *gin.Context) (err error) {
@@ -39,15 +37,6 @@ func (service *transaction1Service) CreateTransaction1Service(ctx *gin.Context) 
 	err = ctx.ShouldBind(&newTransaction1)
 	if err != nil {
 		return err
-	}
-
-	transaction0, err := service.trans0Repo.GetTransaction0ByIdRepository(newTransaction1.TransactionId)
-	if err != nil {
-		return err
-	}
-
-	if common.IsEmptyField(transaction0.Id) {
-		return errors.New("transaction_id not registered")
 	}
 
 	menu, err := service.menuRepo.GetMenuByIdRepository(newTransaction1.MenuId)

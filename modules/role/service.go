@@ -4,6 +4,7 @@ import (
 	"GoCat/helpers/common"
 	"GoCat/middlewares"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -48,6 +49,7 @@ func (service *roleService) CreateRoleService(ctx *gin.Context) (err error) {
 
 	err = service.repository.CreateRoleRepository(newRole)
 	if err != nil {
+		fmt.Println(err.Error())
 		return errors.New("failed to add new role")
 	}
 

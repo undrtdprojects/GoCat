@@ -64,7 +64,7 @@ func (r *transaction0Repository) GetAllTransaction0Repository() (transaction0s [
 		var transaction0 Transaction0
 		if err = rows.Scan(&transaction0.Id, &transaction0.UserId, &transaction0.GrandTotalPrice,
 			&transaction0.CreatedAt, &transaction0.CreatedBy, &transaction0.CreatedOn,
-			&transaction0.ModifiedAt, &transaction0.ModifiedBy, transaction0.ModifiedOn); err != nil {
+			&transaction0.ModifiedAt, &transaction0.ModifiedBy, &transaction0.ModifiedOn); err != nil {
 			return nil, err
 		}
 		transaction0s = append(transaction0s, transaction0)

@@ -5,7 +5,6 @@ import (
 	"GoCat/helpers/common"
 	"GoCat/middlewares"
 	"GoCat/modules/menu"
-	"GoCat/modules/transaction0"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +13,7 @@ func Initiator(router *gin.Engine) {
 	api := router.Group("/api")
 	api.Use(middlewares.JwtMiddleware())
 	api.Use(middlewares.Logging())
+	api.Use(middlewares.RoleCheck())
 	{
 		api.POST("/transaction1", CreateTransaction1Router)
 		api.GET("/transaction1s", GetAllTransaction1Router)
@@ -26,9 +26,8 @@ func Initiator(router *gin.Engine) {
 func CreateTransaction1Router(ctx *gin.Context) {
 	var (
 		transaction1Repo = NewRepository(connection.DBConnections)
-		transaction0Repo = transaction0.NewRepository(connection.DBConnections)
 		menuRepo         = menu.NewRepository(connection.DBConnections)
-		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo)
+		transaction1Srv  = NewService(transaction1Repo, menuRepo)
 	)
 
 	err := transaction1Srv.CreateTransaction1Service(ctx)
@@ -43,9 +42,8 @@ func CreateTransaction1Router(ctx *gin.Context) {
 func GetAllTransaction1Router(ctx *gin.Context) {
 	var (
 		transaction1Repo = NewRepository(connection.DBConnections)
-		transaction0Repo = transaction0.NewRepository(connection.DBConnections)
 		menuRepo         = menu.NewRepository(connection.DBConnections)
-		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo)
+		transaction1Srv  = NewService(transaction1Repo, menuRepo)
 	)
 
 	transaction1s, err := transaction1Srv.GetAllTransaction1Service(ctx)
@@ -60,9 +58,8 @@ func GetAllTransaction1Router(ctx *gin.Context) {
 func GetTransaction1ByIdRouter(ctx *gin.Context) {
 	var (
 		transaction1Repo = NewRepository(connection.DBConnections)
-		transaction0Repo = transaction0.NewRepository(connection.DBConnections)
 		menuRepo         = menu.NewRepository(connection.DBConnections)
-		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo)
+		transaction1Srv  = NewService(transaction1Repo, menuRepo)
 	)
 
 	transaction1, err := transaction1Srv.GetTransaction1ByIdService(ctx)
@@ -77,9 +74,8 @@ func GetTransaction1ByIdRouter(ctx *gin.Context) {
 func DeleteTransaction1Router(ctx *gin.Context) {
 	var (
 		transaction1Repo = NewRepository(connection.DBConnections)
-		transaction0Repo = transaction0.NewRepository(connection.DBConnections)
 		menuRepo         = menu.NewRepository(connection.DBConnections)
-		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo)
+		transaction1Srv  = NewService(transaction1Repo, menuRepo)
 	)
 
 	err := transaction1Srv.DeleteTransaction1Service(ctx)
@@ -94,9 +90,8 @@ func DeleteTransaction1Router(ctx *gin.Context) {
 func UpdateTransaction1Router(ctx *gin.Context) {
 	var (
 		transaction1Repo = NewRepository(connection.DBConnections)
-		transaction0Repo = transaction0.NewRepository(connection.DBConnections)
 		menuRepo         = menu.NewRepository(connection.DBConnections)
-		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo)
+		transaction1Srv  = NewService(transaction1Repo, menuRepo)
 	)
 
 	err := transaction1Srv.UpdateTransaction1Service(ctx)

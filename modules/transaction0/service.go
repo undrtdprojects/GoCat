@@ -3,10 +3,13 @@ package transaction0
 import (
 	"GoCat/helpers/common"
 	"GoCat/middlewares"
+	"GoCat/modules/menu"
 	"GoCat/modules/payment"
+	"GoCat/modules/transaction1"
 	"GoCat/modules/user"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,14 +26,12 @@ type transaction0Service struct {
 	repository  Repository
 	repoUser    user.Repository
 	paymentRepo payment.Repository
+	menuRepo    menu.Repository
+	trans1Repo  transaction1.Repository
 }
 
-type userService struct {
-	userRepository user.Repository
-}
-
-func NewService(repository Repository, repoUser user.Repository, paymentRepo payment.Repository) Service {
-	return &transaction0Service{repository, repoUser, paymentRepo}
+func NewService(repository Repository, repoUser user.Repository, paymentRepo payment.Repository, menuRepo menu.Repository, trans1Repo transaction1.Repository) Service {
+	return &transaction0Service{repository, repoUser, paymentRepo, menuRepo, trans1Repo}
 }
 
 func (service *transaction0Service) CreateTransaction0Service(ctx *gin.Context) (err error) {
@@ -44,12 +45,13 @@ func (service *transaction0Service) CreateTransaction0Service(ctx *gin.Context) 
 		return err
 	}
 
-	user, err := service.repoUser.GetUserById(newTransaction0.UserId)
+	user, err := service.repoUser.GetUserByUsername(userLogin.Username)
 	if err != nil {
 		return err
 	}
+	newTransaction0.UserId = user.Id
 
-	if common.IsEmptyField(user.Id) {
+	if common.IsEmptyField(user.Username) {
 		return errors.New("user not registered")
 	}
 
@@ -57,7 +59,10 @@ func (service *transaction0Service) CreateTransaction0Service(ctx *gin.Context) 
 	if err != nil {
 		return err
 	}
-	if common.IsEmptyField(payment.Id) {
+
+	fmt.Println("payment: ", payment)
+
+	if common.IsEmptyField(payment.Name) {
 		return errors.New("payment_id not registered")
 	}
 
@@ -78,6 +83,35 @@ func (service *transaction0Service) CreateTransaction0Service(ctx *gin.Context) 
 
 	newTransaction0.Id = fmt.Sprintf("%s-%05d", "CAT", index)
 
+	var GrandTotalPrice int
+	// insert di table transaction1
+	for _, trans1 := range newTransaction0.ListDetail {
+		trans1.TransactionId = newTransaction0.Id
+		trans1.DateTransaction = time.Now()
+
+		menu, err := service.menuRepo.GetMenuByIdRepository(trans1.MenuId)
+		if err != nil {
+			return err
+		}
+		price := menu.Price * trans1.Qty
+		trans1.TotalPrice = price
+		GrandTotalPrice += price
+
+		trans1.CreatedAt = defaultField.CreatedAt
+		trans1.CreatedBy = userLogin.Username
+		trans1.CreatedOn = defaultField.CreatedOn
+		trans1.ModifiedAt = defaultField.ModifiedAt
+		trans1.ModifiedBy = userLogin.Username
+		trans1.ModifiedOn = defaultField.ModifiedOn
+
+		err = service.trans1Repo.CreateTransaction1Repository(trans1)
+		if err != nil {
+			return err
+		}
+	}
+	newTransaction0.GrandTotalPrice = GrandTotalPrice
+
+	fmt.Println("newTransaction0: ", newTransaction0)
 	err = service.repository.CreateTransaction0Repository(newTransaction0)
 	if err != nil {
 		return errors.New("failed to add new transaction0")

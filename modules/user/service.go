@@ -25,17 +25,16 @@ type userService struct {
 }
 
 func NewService(repository Repository) Service {
-	return &userService{
-		repository,
-	}
+	return &userService{repository}
 }
 
 func (service *userService) GetListUserService(ctx *gin.Context) (result []User, err error) {
 	result, err = service.repository.GetList()
+
 	if err != nil {
-		return
+		return result, err
 	}
-	return
+	return result, nil
 }
 
 func (service *userService) GetUserByUsernameService(ctx *gin.Context) (result User, err error) {
@@ -122,7 +121,9 @@ func (service *userService) SignUpService(ctx *gin.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	fmt.Println("user :", user)
+
+	fmt.Println("user:", user)
+
 	err = service.repository.SignUp(user)
 	if err != nil {
 		return err

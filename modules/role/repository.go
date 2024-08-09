@@ -26,7 +26,7 @@ func NewRepository(database *sql.DB) Repository {
 func (r *roleRepository) CreateRoleRepository(role Role) (err error) {
 	sqlStmt := "INSERT INTO " + constant.RoleTableName.String() + "\n" +
 		"(name, created_at, created_by, created_on, modified_at, modified_by, modified_on)" + "\n" +
-		"VALUES ($1, $2, $3, $4, $5)"
+		"VALUES ($1, $2, $3, $4, $5, $6, $7)"
 
 	params := []interface{}{
 		role.Name,

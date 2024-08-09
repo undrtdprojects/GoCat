@@ -3,6 +3,7 @@ package user
 import (
 	"GoCat/helpers/constant"
 	"database/sql"
+	"fmt"
 )
 
 type Repository interface {
@@ -122,7 +123,7 @@ func (r *userRepository) Delete(user User) (err error) {
 }
 
 func (r *userRepository) GetList() (users []User, err error) {
-	sqlStmt := "SELECT username, password, role_id FROM " + constant.UsersTableName.String()
+	sqlStmt := "SELECT id, username, password, role_id, created_at, created_by, created_on, modified_at, modified_by, modified_on FROM " + constant.UsersTableName.String()
 
 	rows, err := r.db.Query(sqlStmt)
 	if err != nil {
@@ -132,9 +133,12 @@ func (r *userRepository) GetList() (users []User, err error) {
 
 	for rows.Next() {
 		var user User
-		if err = rows.Scan(&user.Username, &user.Password, &user.RoleId); err != nil {
+		if err = rows.Scan(&user.Id, &user.Username, &user.Password, &user.RoleId, &user.CreatedAt, &user.CreatedBy, &user.CreatedOn,
+			&user.ModifiedAt, &user.ModifiedBy, &user.ModifiedOn); err != nil {
 			return nil, err
 		}
+		fmt.Println("rows:", user)
+
 		users = append(users, user)
 	}
 
@@ -142,7 +146,7 @@ func (r *userRepository) GetList() (users []User, err error) {
 }
 
 func (r *userRepository) GetUserByUsername(username string) (user User, err error) {
-	sqlStmt := "SELECT username, password, role_id FROM " + constant.UsersTableName.String() + " WHERE username = $1"
+	sqlStmt := "SELECT id, username, password, role_id FROM " + constant.UsersTableName.String() + " WHERE username = $1"
 
 	params := []interface{}{
 		username,
@@ -154,7 +158,7 @@ func (r *userRepository) GetUserByUsername(username string) (user User, err erro
 	defer rows.Close()
 
 	for rows.Next() {
-		if err = rows.Scan(&user.Username, &user.Password, &user.RoleId); err != nil {
+		if err = rows.Scan(&user.Id, &user.Username, &user.Password, &user.RoleId); err != nil {
 			return user, err
 		}
 	}
