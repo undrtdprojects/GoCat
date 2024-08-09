@@ -42,3 +42,10 @@
     "re_type_password": "userrr123",
     "role_id": 2
 }
+
+{
+    "username": "admin",
+    "password": "admin123",
+    "re_type_password": "admin123",
+    "role_id": 1
+}

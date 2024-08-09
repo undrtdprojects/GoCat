@@ -26,12 +26,13 @@ func NewRepository(database *sql.DB) Repository {
 
 func (r *transaction0Repository) CreateTransaction0Repository(transaction0 Transaction0) (err error) {
 	sqlStmt := "INSERT INTO " + constant.Transaction0TableName.String() + "\n" +
-		"(id, user_id, grand_total_price, created_at, created_by, created_on, modified_at, modified_by, modified_on)" + "\n" +
-		"VALUES ($1, $2, $3, $4, $5, $6, $7)"
+		"(id, user_id, payment_id, grand_total_price, created_at, created_by, created_on, modified_at, modified_by, modified_on)" + "\n" +
+		"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
 
 	params := []interface{}{
 		transaction0.Id,
 		transaction0.UserId,
+		transaction0.PaymentId,
 		transaction0.GrandTotalPrice,
 		transaction0.CreatedAt,
 		transaction0.CreatedBy,

@@ -4,6 +4,7 @@ create table
     transaction0 (
         id VARCHAR(20) PRIMARY KEY,
         user_id INT NOT NULL,
+        payment_id INT NOT NULL,
         grand_total_price INT NOT NULL,
         created_at TIMESTAMP NOT NULL,
         created_by VARCHAR(255) NOT NULL,

@@ -12,7 +12,7 @@
           "db_port": 5432,
           "db_name": "gocat",
           "db_user": "postgres",
-          "db_password": "gregaldi",
+          "db_password": "DataKu228",
           "db_engine": "postgres"
         }
       }

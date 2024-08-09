@@ -12,6 +12,7 @@ func Initiator(router *gin.Engine) {
 	api := router.Group("/api")
 	api.Use(middlewares.JwtMiddleware())
 	api.Use(middlewares.Logging())
+	api.Use(middlewares.RoleCheck())
 	{
 		api.POST("/categories", CreateCategoriesRouter)
 		api.GET("/categories", GetAllCategoriesRouter)

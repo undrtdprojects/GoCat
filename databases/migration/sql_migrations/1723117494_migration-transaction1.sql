@@ -8,7 +8,6 @@ create table
         date_transaction TIMESTAMP NOT NULL,
         qty INT NOT NULL,
         total_price INT NOT NULL,
-        payment_id INT NOT NULL,
         created_at TIMESTAMP NOT NULL,
         created_by VARCHAR(255) NOT NULL,
         created_on VARCHAR(255) NOT NULL,

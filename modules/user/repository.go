@@ -9,6 +9,7 @@ type Repository interface {
 	Login(user LoginRequest) (result User, err error)
 	SignUp(user User) (err error)
 	Update(user User) (err error)
+	ChangePassword(user User) (err error)
 	Delete(user User) (err error)
 	GetList() (user []User, err error)
 	GetUserByUsername(username string) (user User, err error)
@@ -71,6 +72,26 @@ func (r *userRepository) Update(user User) (err error) {
 		user.Username,
 		user.Password,
 		user.RoleId,
+		user.ModifiedAt,
+		user.ModifiedBy,
+		user.ModifiedOn,
+		user.Id,
+	}
+
+	_, err = r.db.Exec(sqlStmt, params...)
+	if err != nil {
+		return
+	}
+
+	return nil
+}
+
+func (r *userRepository) ChangePassword(user User) (err error) {
+	sqlStmt := "UPDATE " + constant.UsersTableName.String() +
+		"SET password = $1, modified_at = $2, modified_by = $3, modified_on = $4 WHERE id = $5"
+
+	params := []interface{}{
+		user.Password,
 		user.ModifiedAt,
 		user.ModifiedBy,
 		user.ModifiedOn,

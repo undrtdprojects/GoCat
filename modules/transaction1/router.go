@@ -4,7 +4,6 @@ import (
 	"GoCat/databases/connection"
 	"GoCat/helpers/common"
 	"GoCat/modules/menu"
-	"GoCat/modules/payment"
 	"GoCat/modules/transaction0"
 
 	"github.com/gin-gonic/gin"
@@ -28,8 +27,7 @@ func CreateTransaction1Router(ctx *gin.Context) {
 		transaction1Repo = NewRepository(connection.DBConnections)
 		transaction0Repo = transaction0.NewRepository(connection.DBConnections)
 		menuRepo         = menu.NewRepository(connection.DBConnections)
-		paymentRepo      = payment.NewRepository(connection.DBConnections)
-		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo, paymentRepo)
+		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo)
 	)
 
 	err := transaction1Srv.CreateTransaction1Service(ctx)
@@ -46,8 +44,7 @@ func GetAllTransaction1Router(ctx *gin.Context) {
 		transaction1Repo = NewRepository(connection.DBConnections)
 		transaction0Repo = transaction0.NewRepository(connection.DBConnections)
 		menuRepo         = menu.NewRepository(connection.DBConnections)
-		paymentRepo      = payment.NewRepository(connection.DBConnections)
-		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo, paymentRepo)
+		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo)
 	)
 
 	transaction1s, err := transaction1Srv.GetAllTransaction1Service(ctx)
@@ -64,8 +61,7 @@ func GetTransaction1ByIdRouter(ctx *gin.Context) {
 		transaction1Repo = NewRepository(connection.DBConnections)
 		transaction0Repo = transaction0.NewRepository(connection.DBConnections)
 		menuRepo         = menu.NewRepository(connection.DBConnections)
-		paymentRepo      = payment.NewRepository(connection.DBConnections)
-		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo, paymentRepo)
+		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo)
 	)
 
 	transaction1, err := transaction1Srv.GetTransaction1ByIdService(ctx)
@@ -82,8 +78,7 @@ func DeleteTransaction1Router(ctx *gin.Context) {
 		transaction1Repo = NewRepository(connection.DBConnections)
 		transaction0Repo = transaction0.NewRepository(connection.DBConnections)
 		menuRepo         = menu.NewRepository(connection.DBConnections)
-		paymentRepo      = payment.NewRepository(connection.DBConnections)
-		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo, paymentRepo)
+		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo)
 	)
 
 	err := transaction1Srv.DeleteTransaction1Service(ctx)
@@ -100,8 +95,7 @@ func UpdateTransaction1Router(ctx *gin.Context) {
 		transaction1Repo = NewRepository(connection.DBConnections)
 		transaction0Repo = transaction0.NewRepository(connection.DBConnections)
 		menuRepo         = menu.NewRepository(connection.DBConnections)
-		paymentRepo      = payment.NewRepository(connection.DBConnections)
-		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo, paymentRepo)
+		transaction1Srv  = NewService(transaction1Repo, transaction0Repo, menuRepo)
 	)
 
 	err := transaction1Srv.UpdateTransaction1Service(ctx)

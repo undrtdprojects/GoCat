@@ -3,14 +3,16 @@ package payment
 import (
 	"GoCat/databases/connection"
 	"GoCat/helpers/common"
+	"GoCat/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Initiator(router *gin.Engine) {
 	api := router.Group("/api")
-	// api.Use(middlewares.JwtMiddleware())
-	// api.Use(middlewares.Logging())
+	api.Use(middlewares.JwtMiddleware())
+	api.Use(middlewares.Logging())
+	api.Use(middlewares.RoleCheck())
 	{
 		api.POST("/payment", CreatePaymentRouter)
 		api.GET("/payments", GetAllPaymentRouter)

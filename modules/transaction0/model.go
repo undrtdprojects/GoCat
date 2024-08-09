@@ -7,6 +7,7 @@ import (
 type Transaction0 struct {
 	Id              string    `json:"id"`
 	UserId          int       `json:"user_id"`
+	PaymentId       int       `json:"payment_id"`
 	GrandTotalPrice int       `json:"grand_total_price"`
 	CreatedAt       time.Time `json:"created_at"`
 	CreatedBy       string    `json:"created_by"`

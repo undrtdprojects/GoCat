@@ -2,7 +2,6 @@ package user
 
 import (
 	"GoCat/helpers/common"
-	"GoCat/helpers/constant"
 	"GoCat/middlewares"
 	"errors"
 	"fmt"
@@ -17,6 +16,7 @@ type Service interface {
 	LoginService(ctx *gin.Context) (result LoginResponse, err error)
 	SignUpService(ctx *gin.Context) (err error)
 	UpdateUserService(ctx *gin.Context) (err error)
+	ChangePasswordService(ctx *gin.Context) (err error)
 	DeleteUserService(ctx *gin.Context) (err error)
 }
 
@@ -31,57 +31,39 @@ func NewService(repository Repository) Service {
 }
 
 func (service *userService) GetListUserService(ctx *gin.Context) (result []User, err error) {
-	userCtx, _ := ctx.Get("user")
-	userLogin := userCtx.(*middlewares.Claims)
-	if common.CheckRole(userLogin.RoleId, constant.ReadActionUser.String()) {
-		result, err = service.repository.GetList()
-		if err != nil {
-			return
-		}
+	result, err = service.repository.GetList()
+	if err != nil {
 		return
-	} else {
-		return nil, errors.New("you don't have access to get all user")
 	}
+	return
 }
 
 func (service *userService) GetUserByUsernameService(ctx *gin.Context) (result User, err error) {
-	userCtx, _ := ctx.Get("user")
-	userLogin := userCtx.(*middlewares.Claims)
-	if common.CheckRole(userLogin.RoleId, constant.ReadActionUser.String()) {
-		var userReq User
-		err = ctx.ShouldBind(&userReq)
-		if err != nil {
-			return
-		}
-
-		result, err = service.repository.GetUserByUsername(userReq.Username)
-		if err != nil {
-			return
-		}
+	var userReq User
+	err = ctx.ShouldBind(&userReq)
+	if err != nil {
 		return
-	} else {
-		return result, errors.New("you don't have access to get user by username")
 	}
+
+	result, err = service.repository.GetUserByUsername(userReq.Username)
+	if err != nil {
+		return
+	}
+	return
 }
+
 func (service *userService) GetUserByIdService(ctx *gin.Context) (result User, err error) {
-	userCtx, _ := ctx.Get("user")
-	userLogin := userCtx.(*middlewares.Claims)
-
-	if common.CheckRole(userLogin.RoleId, constant.ReadActionUser.String()) {
-		var userReq User
-		err = ctx.ShouldBind(&userReq)
-		if err != nil {
-			return
-		}
-
-		result, err = service.repository.GetUserById(userReq.Id)
-		if err != nil {
-			return
-		}
+	var userReq User
+	err = ctx.ShouldBind(&userReq)
+	if err != nil {
 		return
-	} else {
-		return result, errors.New("you don't have access to get user by id")
 	}
+
+	result, err = service.repository.GetUserById(userReq.Id)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func (service *userService) LoginService(ctx *gin.Context) (result LoginResponse, err error) {
@@ -150,40 +132,42 @@ func (service *userService) SignUpService(ctx *gin.Context) (err error) {
 }
 
 func (service *userService) UpdateUserService(ctx *gin.Context) (err error) {
-	userCtx, _ := ctx.Get("user")
-	userLogin := userCtx.(*middlewares.Claims)
-	if common.CheckRole(userLogin.RoleId, constant.UpdateActionUser.String()) {
-		var userReq User
-		err = ctx.ShouldBind(&userReq)
-		if err != nil {
-			return err
-		}
-
-		err = service.repository.Update(userReq)
-		if err != nil {
-			return err
-		}
-		return nil
-	} else {
-		return errors.New("you don't have access to update user")
+	var userReq User
+	err = ctx.ShouldBind(&userReq)
+	if err != nil {
+		return err
 	}
+
+	err = service.repository.Update(userReq)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (service *userService) ChangePasswordService(ctx *gin.Context) (err error) {
+	var userReq User
+	err = ctx.ShouldBind(&userReq)
+	if err != nil {
+		return err
+	}
+
+	err = service.repository.ChangePassword(userReq)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (service *userService) DeleteUserService(ctx *gin.Context) (err error) {
-	userCtx, _ := ctx.Get("user")
-	userLogin := userCtx.(*middlewares.Claims)
-	if common.CheckRole(userLogin.RoleId, constant.DeleteActionUser.String()) {
-		var userReq User
-		err = ctx.ShouldBind(&userReq)
-		if err != nil {
-			return err
-		}
-		err = service.repository.Delete(userReq)
-		if err != nil {
-			return err
-		}
-		return nil
-	} else {
-		return errors.New("you don't have access to delete user")
+	var userReq User
+	err = ctx.ShouldBind(&userReq)
+	if err != nil {
+		return err
 	}
+	err = service.repository.Delete(userReq)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -9,7 +9,6 @@ type Transaction1 struct {
 	DateTransaction time.Time `json:"date_transaction"`
 	Qty             int       `json:"qty"`
 	TotalPrice      int       `json:"total_price"`
-	PaymentId       int       `json:"payment_id"`
 	CreatedAt       time.Time `json:"created_at"`
 	CreatedBy       string    `json:"created_by"`
 	CreatedOn       string    `json:"created_on"`

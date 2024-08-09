@@ -12,6 +12,7 @@ func Initiator(router *gin.Engine) {
 	{
 		api.POST("/login", Login)
 		api.POST("/signup", SignUp)
+		api.PUT("/change-password", ChangePassword)
 	}
 }
 
@@ -43,4 +44,19 @@ func SignUp(ctx *gin.Context) {
 	}
 
 	common.GenerateSuccessResponse(ctx, "awesome, successfully create user")
+}
+
+func ChangePassword(ctx *gin.Context) {
+	var (
+		userRepo = NewRepository(connection.DBConnections)
+		userSrv  = NewService(userRepo)
+	)
+
+	err := userSrv.ChangePasswordService(ctx)
+	if err != nil {
+		common.GenerateErrorResponse(ctx, err.Error())
+		return
+	}
+
+	common.GenerateSuccessResponse(ctx, "awesome, successfully change password")
 }
