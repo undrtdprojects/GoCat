@@ -3,6 +3,7 @@ package transaction1
 import (
 	"GoCat/databases/connection"
 	"GoCat/helpers/common"
+	"GoCat/middlewares"
 	"GoCat/modules/menu"
 	"GoCat/modules/transaction0"
 
@@ -11,8 +12,8 @@ import (
 
 func Initiator(router *gin.Engine) {
 	api := router.Group("/api")
-	// api.Use(middlewares.JwtMiddleware())
-	// api.Use(middlewares.Logging())
+	api.Use(middlewares.JwtMiddleware())
+	api.Use(middlewares.Logging())
 	{
 		api.POST("/transaction1", CreateTransaction1Router)
 		api.GET("/transaction1s", GetAllTransaction1Router)
