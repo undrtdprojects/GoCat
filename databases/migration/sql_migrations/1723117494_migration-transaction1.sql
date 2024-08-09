@@ -16,6 +16,32 @@ create table
         modified_on VARCHAR(255) NOT NULL
     );
 
+    INSERT INTO transaction1 (
+        transaction_id, 
+        menu_id, 
+        date_transaction, 
+        qty, 
+        total_price, 
+        created_at, 
+        created_by, 
+        created_on, 
+        modified_at, 
+        modified_by, 
+        modified_on
+    ) VALUES (
+        'CAT-00001',
+        'BEV-0001',
+        CURRENT_TIMESTAMP,
+        10,
+        50000,
+        CURRENT_TIMESTAMP,
+        'system',
+        'localhost',
+        CURRENT_TIMESTAMP,
+        'system',
+        'localhost'
+    );
+
 -- +migrate StatementEnd
 -- +migrate Down
 -- +migrate StatementBegin

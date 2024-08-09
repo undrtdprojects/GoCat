@@ -14,6 +14,30 @@ create table
         modified_on VARCHAR(255) NOT NULL
     );
 
+    INSERT INTO transaction0 (
+        id, 
+        user_id, 
+        payment_id, 
+        grand_total_price, 
+        created_at, 
+        created_by, 
+        created_on, 
+        modified_at, 
+        modified_by, 
+        modified_on
+    ) VALUES (
+        'CAT-00001',
+        1,
+        1,
+        50000,
+        CURRENT_TIMESTAMP,
+        'system',
+        'web',
+        CURRENT_TIMESTAMP,
+        'system',
+        'web'
+    );
+
 -- +migrate StatementEnd
 -- +migrate Down
 -- +migrate StatementBegin

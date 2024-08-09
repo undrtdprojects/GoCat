@@ -12,6 +12,16 @@ create table
         modified_on VARCHAR(255) NOT NULL
     );
 
+    INSERT INTO role (name, created_at, created_by, created_on, modified_at, modified_by, modified_on)
+    VALUES 
+    ('Admin', CURRENT_TIMESTAMP, 'System', 'Initial Setup', CURRENT_TIMESTAMP, 'System', 'Initial Setup'),
+    ('User', CURRENT_TIMESTAMP, 'System', 'Initial Setup', CURRENT_TIMESTAMP, 'System', 'Initial Setup'),
+    ('Manager', CURRENT_TIMESTAMP, 'System', 'Initial Setup', CURRENT_TIMESTAMP, 'System', 'Initial Setup');
+
+
+
+    This
+
 -- +migrate StatementEnd
 
 -- +migrate Down

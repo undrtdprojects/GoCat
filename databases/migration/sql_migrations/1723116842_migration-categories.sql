@@ -12,6 +12,16 @@ create table
         modified_on VARCHAR(255) NOT NULL
     );
 
+
+    INSERT INTO categories 
+            (id, name, created_at, created_by, created_on, modified_at, modified_by, modified_on)
+        VALUES 
+            ('APT', 'Appetizers', CURRENT_TIMESTAMP, 'System', 'Initial Setup', CURRENT_TIMESTAMP, 'System', 'Initial Setup'),
+            ('MAC', 'Main Course', CURRENT_TIMESTAMP, 'System', 'Initial Setup', CURRENT_TIMESTAMP, 'System', 'Initial Setup'),
+            ('DST', 'Desserts', CURRENT_TIMESTAMP, 'System', 'Initial Setup', CURRENT_TIMESTAMP, 'System', 'Initial Setup'),
+            ('BEV', 'Beverages', CURRENT_TIMESTAMP, 'System', 'Initial Setup', CURRENT_TIMESTAMP, 'System', 'Initial Setup'),
+            ('SPC', 'Specials', CURRENT_TIMESTAMP, 'System', 'Initial Setup', CURRENT_TIMESTAMP, 'System', 'Initial Setup');
+
 -- +migrate StatementEnd
 
 -- +migrate Down
