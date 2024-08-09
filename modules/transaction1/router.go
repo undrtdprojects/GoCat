@@ -15,7 +15,7 @@ func Initiator(router *gin.Engine) {
 	// api.Use(middlewares.Logging())
 	{
 		api.POST("/transaction1", CreateTransaction1Router)
-		api.GET("/transaction1", GetAllTransaction1Router)
+		api.GET("/transaction1s", GetAllTransaction1Router)
 		api.GET("/transaction1/:id", GetTransaction1ByIdRouter)
 		api.PUT("/transaction1/:id", UpdateTransaction1Router)
 		api.DELETE("/transaction1/:id", DeleteTransaction1Router)
