@@ -19,9 +19,6 @@ create table
     ('Manager', CURRENT_TIMESTAMP, 'System', 'Initial Setup', CURRENT_TIMESTAMP, 'System', 'Initial Setup');
 
 
-
-    This
-
 -- +migrate StatementEnd
 
 -- +migrate Down
